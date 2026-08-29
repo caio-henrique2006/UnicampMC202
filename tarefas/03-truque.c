@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
 
 void input_v(int n, int V[])
 {
@@ -33,20 +34,14 @@ void operSoma(int V[], int r, int R[], int a, int b)
 {
     int i_atual = a;
     int soma = 0;
-    int quant_para_mult = r - (i_atual % r);
-    if (i_atual + quant_para_mult < b)
+    while ((i_atual) % r != 0 && i_atual <= b)
     {
-        for (int i = 0; i < quant_para_mult; i++)
-        {
-            soma += V[i_atual];
-            i_atual += 1;
-        }
+        soma += V[i_atual];
+        i_atual += 1;
     }
-    int current_mult = (i_atual) / r;
     while (b - (i_atual) >= r)
     {
-        soma += R[current_mult];
-        current_mult += 1;
+        soma += R[(i_atual) / r];
         i_atual += r;
     }
     while ((i_atual - 1) != b)
@@ -54,7 +49,7 @@ void operSoma(int V[], int r, int R[], int a, int b)
         soma += V[i_atual];
         i_atual += 1;
     }
-    printf("%d \n", soma);
+    printf("%d\n", soma);
 }
 
 void operSubst(int V[], int r, int R[], int a, int b)
@@ -77,15 +72,15 @@ int main()
 
     char mod;
     int a, b;
-    while (scanf(" %c %d %d", &mod, &a, &b))
+    while (scanf(" %c %d %d", &mod, &a, &b) == 3)
     {
         if (mod == 's')
         {
-            operSoma(V, tam_r, R, a, b);
+            operSoma(V, r, R, a, b);
         }
         if (mod == 'a')
         {
-            operSubst(V, tam_r, R, a, b);
+            operSubst(V, r, R, a, b);
         }
     }
 
