@@ -33,14 +33,20 @@ void operSoma(int V[], int r, int R[], int a, int b)
 {
     int i_atual = a;
     int soma = 0;
-    while ((i_atual) % r != 0 && i_atual <= b)
+    int quant_para_mult = r - (i_atual % r);
+    if (i_atual + quant_para_mult < b)
     {
-        soma += V[i_atual];
-        i_atual += 1;
+        for (int i = 0; i < quant_para_mult; i++)
+        {
+            soma += V[i_atual];
+            i_atual += 1;
+        }
     }
+    int current_mult = (i_atual) / r;
     while (b - (i_atual) >= r)
     {
-        soma += R[(i_atual) / r];
+        soma += R[current_mult];
+        current_mult += 1;
         i_atual += r;
     }
     while ((i_atual - 1) != b)
@@ -53,7 +59,8 @@ void operSoma(int V[], int r, int R[], int a, int b)
 
 void operSubst(int V[], int r, int R[], int a, int b)
 {
-    R[(a / r)] = R[(a / r)] + (b - V[a]);
+    int R_pos = a / r;
+    R[(R_pos)] = R[(R_pos)] + (b - V[a]);
     V[a] = b;
 }
 
