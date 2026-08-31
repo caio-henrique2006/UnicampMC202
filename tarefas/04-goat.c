@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+// Executa a regra 1 e 2
 int processa_primeira_letra(char char_atual, char *palavra, char *fim_palavra)
 {
     if (char_atual == 'a' || char_atual == 'e' || char_atual == 'i' || char_atual == 'o' || char_atual == 'u' ||
@@ -22,6 +23,7 @@ int processa_primeira_letra(char char_atual, char *palavra, char *fim_palavra)
     }
 }
 
+// Executa a regra 3
 int processa_numero(char char_atual, char *frase, int *i)
 {
     char str_numero[120] = "";
@@ -44,6 +46,7 @@ int processa_numero(char char_atual, char *frase, int *i)
     return numero;
 }
 
+// Função de utilidade para somar os a's ao final
 char char_a_final(char *a_final, int i)
 {
     for (int j = 0; j < i; j++)
@@ -72,6 +75,7 @@ int main()
         for (int i = 0; 1; i++)
         {
             char char_atual = frase[i];
+            // Executa a definição da tradução da palavra quando encontra um espaço vazio ou o fim da frase
             if (isspace((unsigned char)char_atual) || char_atual == '\0')
             {
                 if (strlen(palavra) > 0 || strlen(fim_palavra) > 0)
@@ -98,6 +102,7 @@ int main()
                     break;
                 }
             }
+            // Observa os casos e igora caracteres especiais
             else if (isalpha((unsigned char)char_atual))
             {
                 if (is_primeira_letra)
@@ -115,6 +120,7 @@ int main()
                 soma_final += processa_numero(char_atual, frase, &i);
             }
         }
+        // Adapta a gramática da resposta
         if (soma_final == 1)
         {
             printf("%d goat says: %s\n", soma_final, trans_frase);
