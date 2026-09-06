@@ -9,15 +9,17 @@ int processa_primeira_letra(char char_atual, char *palavra, char *fim_palavra)
     if (char_atual == 'a' || char_atual == 'e' || char_atual == 'i' || char_atual == 'o' || char_atual == 'u' ||
         char_atual == 'A' || char_atual == 'E' || char_atual == 'I' || char_atual == 'O' || char_atual == 'U')
     {
-        palavra[strlen(palavra)] = char_atual;
-        palavra[strlen(palavra)] = '\0';
+        int tam = strlen(palavra);
+        palavra[tam] = char_atual;
+        palavra[tam + 1] = '\0';
         strcat(fim_palavra, "ma");
         return 0;
     }
     else
     {
-        fim_palavra[strlen(fim_palavra)] = char_atual;
-        fim_palavra[strlen(fim_palavra)] = '\0';
+        int tam = strlen(fim_palavra);
+        fim_palavra[tam] = char_atual;
+        fim_palavra[tam + 1] = '\0';
         strcat(fim_palavra, "ma");
         return 1;
     }
@@ -26,15 +28,18 @@ int processa_primeira_letra(char char_atual, char *palavra, char *fim_palavra)
 // Executa a regra 3
 int processa_numero(char char_atual, char *frase, int *i)
 {
-    char str_numero[120] = "";
+    char str_numero[1000] = "";
     str_numero[0] = char_atual;
+    str_numero[1] = '\0';
     int j = *i;
     while (1)
     {
         j++;
         if (isdigit((unsigned char)frase[j]))
         {
-            str_numero[strlen(str_numero)] = frase[j];
+            int tam = strlen(str_numero);
+            str_numero[tam] = frase[j];
+            str_numero[tam + 1] = '\0';
         }
         else
         {
@@ -47,27 +52,29 @@ int processa_numero(char char_atual, char *frase, int *i)
 }
 
 // Função de utilidade para somar os a's ao final
-char char_a_final(char *a_final, int i)
+void char_a_final(char *a_final, int i)
 {
     for (int j = 0; j < i; j++)
     {
-        strcat(a_final, "a");
+        a_final[j] = 'a';
     }
+    a_final[i] = '\0';
 }
 
 int main()
 {
     // Input da frase
-    char trans_frase[210000] = "";
-    char frase[210000];
+    char trans_frase[410000] = "";
+    char frase[410000];
     while (fgets(frase, sizeof frase, stdin) != NULL)
     {
         frase[strcspn(frase, "\n")] = '\0';
 
         // Analisando palavra a palavra:
-        memset(trans_frase, 0, sizeof(trans_frase));
+        trans_frase[0] = '\0';
+        int pos_trans_frase = 0;
         char palavra[120] = "";
-        char fim_palavra[6] = "";
+        char fim_palavra[20] = "";
         char a_final[120] = "";
         int is_primeira_letra = 1;
         int is_primeira_letra_consoante = 0;
@@ -80,21 +87,25 @@ int main()
             {
                 if (strlen(palavra) > 0 || strlen(fim_palavra) > 0)
                 {
-                    memset(a_final, 0, sizeof(a_final));
+                    a_final[0] = '\0';
                     int tam_palavra = strlen(palavra);
                     if (is_primeira_letra_consoante)
                         tam_palavra++;
                     char_a_final(a_final, tam_palavra);
-                    strcat(trans_frase, palavra);
-                    strcat(trans_frase, fim_palavra);
-                    strcat(trans_frase, a_final);
+                    strcpy(trans_frase + pos_trans_frase, palavra);
+                    pos_trans_frase += strlen(palavra);
+                    strcpy(trans_frase + pos_trans_frase, fim_palavra);
+                    pos_trans_frase += strlen(fim_palavra);
+                    strcpy(trans_frase + pos_trans_frase, a_final);
+                    pos_trans_frase += strlen(a_final);
                     if (char_atual != '\0')
                     {
-                        strcat(trans_frase, " ");
+                        strcpy(trans_frase + pos_trans_frase, " ");
+                        pos_trans_frase += 1;
                     }
                 }
-                memset(palavra, 0, sizeof(palavra));
-                memset(fim_palavra, 0, sizeof(fim_palavra));
+                palavra[0] = '\0';
+                fim_palavra[0] = '\0';
                 is_primeira_letra_consoante = 0;
                 is_primeira_letra = 1;
                 if (char_atual == '\0')
@@ -112,7 +123,9 @@ int main()
                 }
                 else
                 {
-                    palavra[strlen(palavra)] = char_atual;
+                    int tam = strlen(palavra);
+                    palavra[tam] = char_atual;
+                    palavra[tam + 1] = '\0';
                 }
             }
             else if (isdigit((unsigned char)char_atual))
@@ -121,7 +134,22 @@ int main()
             }
         }
         // Adapta a gramática da resposta
-        if (soma_final == 1)
+        if (pos_trans_frase > 0)
+        {
+            if (trans_frase[pos_trans_frase - 1] == ' ')
+            {
+                trans_frase[pos_trans_frase - 1] = '\0';
+            }
+        }
+        if (pos_trans_frase == 0 && soma_final == 1)
+        {
+            printf("%d goat says:\n", soma_final);
+        }
+        else if (pos_trans_frase == 0 && soma_final != 1)
+        {
+            printf("%d goats say:\n", soma_final);
+        }
+        else if (pos_trans_frase != 0 && soma_final == 1)
         {
             printf("%d goat says: %s\n", soma_final, trans_frase);
         }
