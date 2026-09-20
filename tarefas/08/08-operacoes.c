@@ -2,22 +2,6 @@
 #include <stdlib.h>
 #include "08-operacoes.h"
 
-static int comparar_inteiros(const void *a, const void *b)
-{
-    const int x = *(const int *)a;
-    const int y = *(const int *)b;
-
-    if (x < y)
-    {
-        return -1;
-    }
-    if (x > y)
-    {
-        return 1;
-    }
-    return 0;
-}
-
 void liberar_conjunto(Conjunto *conjunto)
 {
     No *atual = conjunto->inicio;
@@ -39,20 +23,32 @@ void criar_conjunto(Conjunto *conjunto)
 void inserir_elemento(Conjunto *conjunto, int valor)
 {
     No *atual = conjunto->inicio;
-    while (atual != NULL)
+    No *anterior = NULL;
+
+    while (atual != NULL && atual->valor < valor)
     {
-        if (atual->valor == valor)
-        {
-            return;
-        }
+        anterior = atual;
         atual = atual->prox;
     }
 
-    No *novo = malloc(sizeof(No));
+    // Observa se já existe
+    if (atual != NULL && atual->valor == valor)
+    {
+        return;
+    }
 
+    No *novo = malloc(sizeof(No));
     novo->valor = valor;
-    novo->prox = conjunto->inicio;
-    conjunto->inicio = novo;
+
+    novo->prox = atual;
+    if (anterior == NULL)
+    {
+        conjunto->inicio = novo;
+    }
+    else
+    {
+        anterior->prox = novo;
+    }
 }
 
 void remover_elemento(Conjunto *conjunto, int valor)
@@ -138,41 +134,14 @@ int contem_elemento(const Conjunto *conjunto, int valor)
 
 void imprimir_conjunto(const Conjunto *conjunto, int id)
 {
-    int quantidade = 0;
-    No *atual = conjunto->inicio;
-    while (atual != NULL)
-    {
-        quantidade++;
-        atual = atual->prox;
-    }
-
-    if (quantidade == 0)
-    {
-        printf("C%d = {}\n", id);
-        return;
-    }
-
-    int *valores = malloc((size_t)quantidade * sizeof(int));
-
-    atual = conjunto->inicio;
-    for (int i = 0; i < quantidade; i++)
-    {
-        valores[i] = atual->valor;
-        atual = atual->prox;
-    }
-
-    qsort(valores, (size_t)quantidade, sizeof(int), comparar_inteiros);
-
     printf("C%d = {", id);
-    for (int i = 0; i < quantidade; i++)
+    for (No *atual = conjunto->inicio; atual != NULL; atual = atual->prox)
     {
-        if (i > 0)
+        if (atual != conjunto->inicio)
         {
             printf(", ");
         }
-        printf("%d", valores[i]);
+        printf("%d", atual->valor);
     }
     printf("}\n");
-
-    free(valores);
 }
