@@ -3,5 +3,26 @@
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
-    "configurations": []
+    "configurations": [
+        {
+      "name": "Debug",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${fileDirname}/darray",     // Executavel gerado
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${fileDirname}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",                            // Use "lldb" no macOS
+      "preLaunchTask": "Compile",          // Deve bater exatamente com o label do tasks.json
+      "setupCommands": [
+        {
+          "description": "Habilitar formatacao no GDB",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+    ]
 }
