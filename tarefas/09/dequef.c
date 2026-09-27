@@ -12,17 +12,10 @@ int df_copy(dequef *origin, int new_cap)
    {
       return 0;
    }
-   // Copy old array into new one
-   int end = (origin->first + origin->size) % origin->cap;
-   int j = 0;
-   for (int i = origin->first; i != end; i++)
+   // Copy origin into new_D
+   for (long k = 0; k < origin->size; k++)
    {
-      new_D->data[j] = origin->data[i];
-      j++;
-      if (i == (origin->cap - 1))
-      {
-         i = -1;
-      }
+      new_D->data[k] = origin->data[(origin->first + k) % origin->cap];
    }
    free(origin->data);
    origin->data = new_D->data;
@@ -217,10 +210,6 @@ float df_eject(dequef *D)
 **/
 float df_get(dequef *D, long i)
 {
-   if (i < 0 || i >= D->size)
-   {
-      return 0;
-   }
    int index = (D->first + i) % D->cap;
    return D->data[index];
 }
