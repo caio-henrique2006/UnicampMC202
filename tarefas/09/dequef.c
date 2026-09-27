@@ -5,7 +5,7 @@
 
 #include "dequef.h"
 
-int df_copy(dequef *origin, int new_cap)
+int df_copy(dequef *origin, long new_cap)
 {
    dequef *new_D = df_alloc(new_cap, origin->factor);
    if (new_D == NULL)
@@ -37,7 +37,7 @@ int df_copy(dequef *origin, int new_cap)
 dequef *df_alloc(long capacity, double factor)
 {
    dequef *D = malloc(sizeof(dequef));
-   if (D == NULL)
+   if (D == NULL || capacity <= 0)
    {
       return NULL;
    }
@@ -90,13 +90,13 @@ int df_push(dequef *D, float x)
 {
    if (D->cap == D->size)
    {
-      long new_cap = D->cap * D->factor;
+      long new_cap = (long)(D->cap * D->factor);
       if (!df_copy(D, new_cap))
       {
          return 0;
       }
    }
-   int i = (D->first + D->size) % D->cap;
+   long i = (D->first + D->size) % D->cap;
    D->data[i] = x;
    D->size++;
 
@@ -120,14 +120,14 @@ float df_pop(dequef *D)
    {
       return 0;
    }
-   int end = (D->first + D->size - 1) % D->cap;
+   long end = (D->first + D->size - 1) % D->cap;
    float removed = D->data[end];
    D->size--;
 
    // Resize
    if (D->size == D->cap / (D->factor * D->factor))
    {
-      long new_cap = D->cap / D->factor;
+      long new_cap = (long)(D->cap / D->factor);
       if (new_cap < D->mincap)
       {
          new_cap = D->mincap;
@@ -154,7 +154,7 @@ int df_inject(dequef *D, float x)
 {
    if (D->cap == D->size)
    {
-      long new_cap = D->cap * D->factor;
+      long new_cap = (long)(D->cap * D->factor);
       if (!df_copy(D, new_cap))
       {
          return 0;
@@ -188,9 +188,9 @@ float df_eject(dequef *D)
    D->first = (D->first + 1 + D->cap) % D->cap;
    D->size--;
 
-   if (D->size == D->cap / (D->factor * D->factor))
+   if (D->size == (long)(D->cap / (D->factor * D->factor)))
    {
-      long new_cap = D->cap / D->factor;
+      long new_cap = (long)(D->cap / D->factor);
       if (new_cap < D->mincap)
       {
          new_cap = D->mincap;
@@ -210,7 +210,7 @@ float df_eject(dequef *D)
 **/
 float df_get(dequef *D, long i)
 {
-   int index = (D->first + i) % D->cap;
+   long index = (D->first + i) % D->cap;
    return D->data[index];
 }
 
@@ -223,7 +223,7 @@ void df_set(dequef *D, long i, float x)
 {
    if (!(i < 0 || i >= D->size))
    {
-      int index = (D->first + i) % D->cap;
+      long index = (D->first + i) % D->cap;
       D->data[index] = x;
    }
 }
@@ -238,14 +238,10 @@ void df_print(dequef *D)
       return;
    }
    printf("deque (%ld): ", D->size);
-   int end = (D->first + D->size) % D->cap;
-   for (int i = D->first; i != end; i++)
+   for (long i = 0; i < D->size; i++)
    {
-      printf("%.1f ", D->data[i]);
-      if (i == (D->cap - 1))
-      {
-         i = -1;
-      }
+      long index = (D->first + i) % D->cap;
+      printf("%.1f ", D->data[index]);
    }
    printf("\n");
 }
