@@ -9,14 +9,13 @@ struct no
     char visibilidade[16];
     char estado[16];
     int altura;
-    int FB;
     No *esq;
     No *dir;
 };
 
-No *inserir(No *raiz, No *novo);
+No *inserir(No *raiz, long id, char visibilidade[16], char estado[16]);
 No *buscar(No *raiz, long id);
-No *atualizar(No *raiz, No *atualizado);
+No *atualizar(No *raiz, long id, char visibilidade[16], char estado[16]);
 No *imprimir_ordem(No *raiz);
 No *imprimir_categorizado(No *raiz);
 

@@ -21,17 +21,14 @@ int main(void)
             long id;
             char visibilidade[16];
             char estado[16];
-            No novo_no;
 
             if (scanf("%ld %15s %15s", &id, visibilidade, estado) != 3)
                 return 0;
 
-            preencher_no(&novo_no, id, visibilidade, estado);
-
             if (comando == 'i')
-                raiz = inserir(raiz, &novo_no);
+                raiz = inserir(raiz, id, visibilidade, estado);
             else
-                raiz = atualizar(raiz, &novo_no);
+                raiz = atualizar(raiz, id, visibilidade, estado);
 
             break;
         }

@@ -25,7 +25,10 @@ static void atualizar_altura_no(No *no)
     int altura_esq = altura_no(no->esq);
     int altura_dir = altura_no(no->dir);
 
-    no->altura = (altura_esq > altura_dir ? altura_esq : altura_dir) + 1;
+    if (altura_esq > altura_dir)
+        no->altura = altura_esq + 1;
+    else
+        no->altura = altura_dir + 1;
 }
 
 static No *rotacao_direita(No *y)
@@ -56,21 +59,19 @@ static No *rotacao_esquerda(No *x)
     return y;
 }
 
-static No *criar_no(No *novo)
+static No *criar_no(long id, char visibilidade[16], char estado[16])
 {
     No *no = malloc(sizeof *no);
 
     if (no == NULL)
-    {
         return NULL;
-    }
 
-    no->id = novo->id;
+    no->id = id;
 
-    strncpy(no->visibilidade, novo->visibilidade, sizeof(no->visibilidade) - 1);
+    strncpy(no->visibilidade, visibilidade, sizeof(no->visibilidade) - 1);
     no->visibilidade[sizeof(no->visibilidade) - 1] = '\0';
 
-    strncpy(no->estado, novo->estado, sizeof(no->estado) - 1);
+    strncpy(no->estado, estado, sizeof(no->estado) - 1);
     no->estado[sizeof(no->estado) - 1] = '\0';
 
     no->altura = 1;
@@ -80,35 +81,37 @@ static No *criar_no(No *novo)
     return no;
 }
 
-static No *inserir_no(No *raiz, No *novo)
+static No *inserir_no(No *raiz, long id, char visibilidade[16], char estado[16])
 {
+    // Caminho até a inserção
     if (raiz == NULL)
-        return criar_no(novo);
+        return criar_no(id, visibilidade, estado);
 
-    if (novo->id < raiz->id)
-        raiz->esq = inserir_no(raiz->esq, novo);
-    else if (novo->id > raiz->id)
-        raiz->dir = inserir_no(raiz->dir, novo);
+    if (id < raiz->id)
+        raiz->esq = inserir_no(raiz->esq, id, visibilidade, estado);
+    else if (id > raiz->id)
+        raiz->dir = inserir_no(raiz->dir, id, visibilidade, estado);
     else
         return raiz;
 
+    // Caminho de volta atualizando a árvore
     atualizar_altura_no(raiz);
 
     int fb = fator_balanceamento(raiz);
 
-    if (fb > 1 && novo->id < raiz->esq->id)
+    if (fb > 1 && id < raiz->esq->id)
         return rotacao_direita(raiz);
 
-    if (fb < -1 && novo->id > raiz->dir->id)
+    if (fb < -1 && id > raiz->dir->id)
         return rotacao_esquerda(raiz);
 
-    if (fb > 1 && novo->id > raiz->esq->id)
+    if (fb > 1 && id > raiz->esq->id)
     {
         raiz->esq = rotacao_esquerda(raiz->esq);
         return rotacao_direita(raiz);
     }
 
-    if (fb < -1 && novo->id < raiz->dir->id)
+    if (fb < -1 && id < raiz->dir->id)
     {
         raiz->dir = rotacao_direita(raiz->dir);
         return rotacao_esquerda(raiz);
@@ -117,12 +120,41 @@ static No *inserir_no(No *raiz, No *novo)
     return raiz;
 }
 
-No *inserir(No *raiz, No *novo)
+No *inserir(No *raiz, long id, char visibilidade[16], char estado[16])
 {
-    if (novo == NULL)
+    return inserir_no(raiz, id, visibilidade, estado);
+}
+
+No *buscar(No *raiz, long id)
+{
+    No *atual = raiz;
+
+    while (atual != NULL)
+    {
+        if (id < atual->id)
+            atual = atual->esq;
+        else if (id > atual->id)
+            atual = atual->dir;
+        else
+            return atual;
+    }
+
+    return NULL;
+}
+
+No *atualizar(No *raiz, long id, char visibilidade[16], char estado[16])
+{
+    No *alvo = buscar(raiz, id);
+
+    if (alvo == NULL)
         return raiz;
 
-    return inserir_no(raiz, novo);
+    strncpy(alvo->visibilidade, visibilidade, sizeof(alvo->visibilidade) - 1);
+    alvo->visibilidade[sizeof(alvo->visibilidade) - 1] = '\0';
+    strncpy(alvo->estado, estado, sizeof(alvo->estado) - 1);
+    alvo->estado[sizeof(alvo->estado) - 1] = '\0';
+
+    return raiz;
 }
 
 static void imprimir_em_ordem(No *no, int *primeiro)
@@ -153,6 +185,37 @@ No *imprimir_ordem(No *raiz)
     printf("documentos: ");
     imprimir_em_ordem(raiz, &primeiro);
     printf("\n");
+
+    return raiz;
+}
+
+static void contar(No *no, long *atualizado, long *desatualizado, long *obsoleto)
+{
+    if (no == NULL)
+        return;
+
+    contar(no->esq, atualizado, desatualizado, obsoleto);
+
+    if (strcmp(no->estado, "atualizado") == 0)
+        (*atualizado)++;
+    else if (strcmp(no->estado, "desatualizado") == 0)
+        (*desatualizado)++;
+    else if (strcmp(no->estado, "obsoleto") == 0)
+        (*obsoleto)++;
+
+    contar(no->dir, atualizado, desatualizado, obsoleto);
+}
+
+No *imprimir_categorizado(No *raiz)
+{
+    long atualizado = 0;
+    long desatualizado = 0;
+    long obsoleto = 0;
+
+    contar(raiz, &atualizado, &desatualizado, &obsoleto);
+
+    printf("atualizado: %ld, desatualizado: %ld, obsoleto: %ld\n",
+           atualizado, desatualizado, obsoleto);
 
     return raiz;
 }
