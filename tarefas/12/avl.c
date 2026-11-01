@@ -157,19 +157,15 @@ No *atualizar(No *raiz, long id, char visibilidade[16], char estado[16])
     return raiz;
 }
 
-static void imprimir_em_ordem(No *no, int *primeiro)
+static void imprimir_em_ordem(No *no)
 {
     if (no == NULL)
         return;
 
-    imprimir_em_ordem(no->esq, primeiro);
-
-    if (!*primeiro)
-        printf(" ");
+    imprimir_em_ordem(no->esq);
     printf("%ld", no->id);
-    *primeiro = 0;
-
-    imprimir_em_ordem(no->dir, primeiro);
+    printf(" ");
+    imprimir_em_ordem(no->dir);
 }
 
 No *imprimir_ordem(No *raiz)
@@ -180,10 +176,8 @@ No *imprimir_ordem(No *raiz)
         return raiz;
     }
 
-    int primeiro = 1;
-
     printf("documentos: ");
-    imprimir_em_ordem(raiz, &primeiro);
+    imprimir_em_ordem(raiz);
     printf("\n");
 
     return raiz;
