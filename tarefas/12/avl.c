@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "avl.h"
 
@@ -59,7 +58,7 @@ static No *rotacao_esquerda(No *x)
     return y;
 }
 
-static No *criar_no(long id, char visibilidade[16], char estado[16])
+static No *criar_no(long id, int visibilidade, int estado)
 {
     No *no = malloc(sizeof *no);
 
@@ -67,12 +66,8 @@ static No *criar_no(long id, char visibilidade[16], char estado[16])
         return NULL;
 
     no->id = id;
-
-    strncpy(no->visibilidade, visibilidade, sizeof(no->visibilidade) - 1);
-    no->visibilidade[sizeof(no->visibilidade) - 1] = '\0';
-
-    strncpy(no->estado, estado, sizeof(no->estado) - 1);
-    no->estado[sizeof(no->estado) - 1] = '\0';
+    no->visibilidade = visibilidade;
+    no->estado = estado;
 
     no->altura = 1;
     no->esq = NULL;
@@ -81,7 +76,7 @@ static No *criar_no(long id, char visibilidade[16], char estado[16])
     return no;
 }
 
-static No *inserir_no(No *raiz, long id, char visibilidade[16], char estado[16])
+static No *inserir_no(No *raiz, long id, int visibilidade, int estado)
 {
     // Caminho até a inserção
     if (raiz == NULL)
@@ -120,7 +115,7 @@ static No *inserir_no(No *raiz, long id, char visibilidade[16], char estado[16])
     return raiz;
 }
 
-No *inserir(No *raiz, long id, char visibilidade[16], char estado[16])
+No *inserir(No *raiz, long id, int visibilidade, int estado)
 {
     return inserir_no(raiz, id, visibilidade, estado);
 }
@@ -142,17 +137,15 @@ No *buscar(No *raiz, long id)
     return NULL;
 }
 
-No *atualizar(No *raiz, long id, char visibilidade[16], char estado[16])
+No *atualizar(No *raiz, long id, int visibilidade, int estado)
 {
     No *alvo = buscar(raiz, id);
 
     if (alvo == NULL)
         return raiz;
 
-    strncpy(alvo->visibilidade, visibilidade, sizeof(alvo->visibilidade) - 1);
-    alvo->visibilidade[sizeof(alvo->visibilidade) - 1] = '\0';
-    strncpy(alvo->estado, estado, sizeof(alvo->estado) - 1);
-    alvo->estado[sizeof(alvo->estado) - 1] = '\0';
+    alvo->visibilidade = visibilidade;
+    alvo->estado = estado;
 
     return raiz;
 }
@@ -190,11 +183,11 @@ static void contar(No *no, long *atualizado, long *desatualizado, long *obsoleto
 
     contar(no->esq, atualizado, desatualizado, obsoleto);
 
-    if (strcmp(no->estado, "atualizado") == 0)
+    if (no->estado == 0)
         (*atualizado)++;
-    else if (strcmp(no->estado, "desatualizado") == 0)
+    else if (no->estado == 1)
         (*desatualizado)++;
-    else if (strcmp(no->estado, "obsoleto") == 0)
+    else if (no->estado == 2)
         (*obsoleto)++;
 
     contar(no->dir, atualizado, desatualizado, obsoleto);
