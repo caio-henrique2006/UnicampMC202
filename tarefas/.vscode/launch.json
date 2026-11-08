@@ -1,0 +1,19 @@
+{
+"version": "0.2.0",
+"configurations": [
+{
+"name": "Debug 13/main",
+"type": "cppdbg",
+"request": "launch",
+"program": "${workspaceFolder}/13/main",
+"args": [],
+"stopAtEntry": false,
+"cwd": "${workspaceFolder}/13",
+"environment": [],
+"externalConsole": false,
+"MIMode": "gdb",
+"miDebuggerPath": "/usr/bin/gdb",
+"preLaunchTask": "build-13-main"
+}
+]
+}

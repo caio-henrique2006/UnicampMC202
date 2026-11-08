@@ -1,0 +1,25 @@
+{
+"version": "2.0.0",
+"tasks": [
+{
+"label": "build-13-main",
+"type": "shell",
+"command": "/usr/bin/gcc",
+"args": [
+"-g",
+"13-indice.c",
+"btree.c",
+"-o",
+"main"
+],
+"options": {
+"cwd": "${workspaceFolder}/13"
+},
+"problemMatcher": ["$gcc"],
+"group": {
+"kind": "build",
+"isDefault": true
+}
+}
+]
+}
