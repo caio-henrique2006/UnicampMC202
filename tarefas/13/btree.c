@@ -56,21 +56,43 @@ No *fila_desenfileirar(Fila *fila)
     return no;
 }
 
-// Encontra a posição exata para a inserção
-static int encontrarIndiceInsercao(const No *no, int codigo)
+// Encontra posição para inserção/descida e informa se a chave já existe no nó
+static int buscarPosicaoNo(const No *no, int codigo, bool *encontrou)
 {
-    int indice_insercao = 0;
-    while (indice_insercao < no->chaves_usadas && no->dados[indice_insercao].codigo < codigo)
-        indice_insercao++;
-    return indice_insercao;
+    int esquerda = 0;
+    int direita = no->chaves_usadas - 1;
+
+    while (esquerda <= direita)
+    {
+        int meio = esquerda + (direita - esquerda) / 2;
+        int codigo_meio = no->dados[meio].codigo;
+
+        if (codigo_meio == codigo)
+        {
+            if (encontrou)
+                *encontrou = true;
+            return meio;
+        }
+
+        if (codigo_meio < codigo)
+            esquerda = meio + 1;
+        else
+            direita = meio - 1;
+    }
+
+    if (encontrou)
+        *encontrou = false;
+
+    return esquerda;
 }
 
 // Percorre a BTree para encontrar o código
 static bool contemCodigo(const No *no, int codigo)
 {
-    int indice_insercao = encontrarIndiceInsercao(no, codigo);
+    bool encontrou = false;
+    int indice_insercao = buscarPosicaoNo(no, codigo, &encontrou);
 
-    if (indice_insercao < no->chaves_usadas && no->dados[indice_insercao].codigo == codigo)
+    if (encontrou)
         return true;
 
     if (no->eh_folha)
@@ -129,29 +151,27 @@ static void dividirFilho(No *pai, int indice_filho)
 
 static void inserirEmNoNaoCheio(No *no, int codigo, long inicio, long fim)
 {
-    int indice_chave = no->chaves_usadas - 1;
-
     // Se for folha, insere diretamente na posição correta (garante que não está cheio)
     if (no->eh_folha)
     {
-        while (indice_chave >= 0 && codigo < no->dados[indice_chave].codigo)
+        bool encontrou = false;
+        int indice_insercao = buscarPosicaoNo(no, codigo, &encontrou);
+
+        for (int indice_chave = no->chaves_usadas - 1; indice_chave >= indice_insercao; indice_chave--)
         {
             no->dados[indice_chave + 1] = no->dados[indice_chave];
-            indice_chave--;
         }
 
-        no->dados[indice_chave + 1].codigo = codigo;
-        no->dados[indice_chave + 1].inicio = inicio;
-        no->dados[indice_chave + 1].fim = fim;
+        no->dados[indice_insercao].codigo = codigo;
+        no->dados[indice_insercao].inicio = inicio;
+        no->dados[indice_insercao].fim = fim;
         no->chaves_usadas++;
         return;
     }
 
     // Se não for folha, percorre recursivamente para encontrar o filho correto
-    while (indice_chave >= 0 && codigo < no->dados[indice_chave].codigo)
-        indice_chave--;
-
-    indice_chave++;
+    bool encontrou = false;
+    int indice_chave = buscarPosicaoNo(no, codigo, &encontrou);
 
     // Divide o filho se estiver cheio na descida da árvore
     if (no->filhos[indice_chave]->chaves_usadas == 2 * no->t - 1)
@@ -168,6 +188,12 @@ void imprimirPorNiveis(const No *raiz)
 {
     if (!raiz)
         return;
+
+    if (raiz->chaves_usadas == 0)
+    {
+        printf("A arvore esta vazia.\n");
+        return;
+    }
 
     // Usa filas para percorrer em largura
     Fila fila;
@@ -195,8 +221,8 @@ void imprimirPorNiveis(const No *raiz)
         {
             No *atual = nos_do_nivel[i];
 
-            if (i > 0)
-                printf(" ");
+            // if (i > 0)
+            //     printf(" ");
 
             printf("[");
             for (int j = 0; j < atual->chaves_usadas; j++)
@@ -205,7 +231,7 @@ void imprimirPorNiveis(const No *raiz)
                     printf(",");
                 printf("%d", atual->dados[j].codigo);
             }
-            printf("]");
+            printf("] ");
         }
 
         printf("\n");
@@ -285,4 +311,59 @@ bool inserir(No **raiz, int codigo, long inicio, long fim)
 
     inserirEmNoNaoCheio(raiz_atual, codigo, inicio, fim);
     return true;
+}
+
+bool buscar(const No *raiz, int codigo, long *inicio, long *fim)
+{
+    const No *atual = raiz;
+
+    while (atual)
+    {
+        bool encontrou = false;
+        int indice = buscarPosicaoNo(atual, codigo, &encontrou);
+
+        if (encontrou)
+        {
+            if (inicio)
+                *inicio = atual->dados[indice].inicio;
+            if (fim)
+                *fim = atual->dados[indice].fim;
+            return true;
+        }
+
+        if (atual->eh_folha)
+            return false;
+
+        atual = atual->filhos[indice];
+    }
+
+    return false;
+}
+
+static void listarRecursivo(const No *no)
+{
+    if (!no)
+        return;
+
+    for (int i = 0; i < no->chaves_usadas; i++)
+    {
+        if (!no->eh_folha)
+            listarRecursivo(no->filhos[i]);
+
+        printf("%d ", no->dados[i].codigo);
+    }
+
+    if (!no->eh_folha)
+        listarRecursivo(no->filhos[no->chaves_usadas]);
+}
+
+void listar(const No *raiz)
+{
+    if (raiz->chaves_usadas == 0)
+    {
+        printf("A arvore esta vazia.\n");
+        return;
+    }
+    listarRecursivo(raiz);
+    printf("\n");
 }

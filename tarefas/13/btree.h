@@ -36,6 +36,8 @@ struct fila
 
 No *criarArvoreB(int t);
 bool inserir(No **raiz, int codigo, long inicio, long fim);
+bool buscar(const No *raiz, int codigo, long *inicio, long *fim);
+void listar(const No *raiz);
 void imprimirPorNiveis(const No *raiz);
 void fila_inicializar(Fila *fila);
 bool fila_vazia(const Fila *fila);

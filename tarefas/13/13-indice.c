@@ -33,8 +33,32 @@ int main(void)
             break;
         }
         case 'p':
+        {
             imprimirPorNiveis(root);
             break;
+        }
+        case 'b':
+        {
+            int x;
+            long ini, fim;
+            if (scanf("%d", &x) == 1)
+            {
+                if (buscar(root, x, &ini, &fim))
+                {
+                    printf("%d: %ld %ld\n", x, ini, fim);
+                }
+                else
+                {
+                    printf("%d nao esta na arvore\n", x);
+                }
+            }
+            break;
+        }
+        case 'l':
+        {
+            listar(root);
+            break;
+        }
         default:
             break;
         }
