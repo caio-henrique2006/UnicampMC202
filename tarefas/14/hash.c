@@ -76,7 +76,7 @@ Hash redimensionar(Hash *hash, slot *extra)
     slot *old_lista1 = hash->lista1;
     slot *old_lista2 = hash->lista2;
     int old_tam = hash->tam;
-    int new_tam = old_tam * 2;
+    int new_tam = old_tam * 1.5;
 
     bool sucesso;
     do
@@ -129,7 +129,7 @@ Hash redimensionar(Hash *hash, slot *extra)
 
 bool cucko1(Hash *hash, int chave, int valor, int *counter, slot *restante)
 {
-    if (*counter > 10)
+    if (*counter > hash->tam)
     {
         restante->key = chave;
         restante->value = valor;
@@ -145,12 +145,6 @@ bool cucko1(Hash *hash, int chave, int valor, int *counter, slot *restante)
         hash->qt_lista1++;
         return true;
     }
-    else if (chave == hash->lista1[pos1].key)
-    {
-        hash->lista1[pos1].key = chave;
-        hash->lista1[pos1].value = valor;
-        return true;
-    }
     slot expulso = hash->lista1[pos1];
     hash->lista1[pos1].key = chave;
     hash->lista1[pos1].value = valor;
@@ -161,7 +155,7 @@ bool cucko1(Hash *hash, int chave, int valor, int *counter, slot *restante)
 
 bool cucko2(Hash *hash, int chave, int valor, int *counter, slot *restante)
 {
-    if (*counter > 10)
+    if (*counter > hash->tam)
     {
         restante->key = chave;
         restante->value = valor;
@@ -175,12 +169,6 @@ bool cucko2(Hash *hash, int chave, int valor, int *counter, slot *restante)
         hash->lista2[pos2].value = valor;
         hash->lista2[pos2].occupied = true;
         hash->qt_lista2++;
-        return true;
-    }
-    else if (chave == hash->lista1[pos2].key)
-    {
-        hash->lista1[pos2].key = chave;
-        hash->lista1[pos2].value = valor;
         return true;
     }
     slot expulso = hash->lista2[pos2];
@@ -200,6 +188,20 @@ void inserir(Hash *hash, int chave, int valor)
 
     int counter = 0;
     slot restante;
+
+    // Observa se a chave já existe e substitui
+    int pos1 = posicao1(chave, hash->tam, hash->seed);
+    if (hash->lista1[pos1].occupied && hash->lista1[pos1].key == chave)
+    {
+        hash->lista1[pos1].value = valor;
+        return;
+    }
+    int pos2 = posicao2(chave, hash->tam, hash->seed);
+    if (hash->lista2[pos2].occupied && hash->lista2[pos2].key == chave)
+    {
+        hash->lista2[pos2].value = valor;
+        return;
+    }
 
     if (!cucko1(hash, chave, valor, &counter, &restante))
     {

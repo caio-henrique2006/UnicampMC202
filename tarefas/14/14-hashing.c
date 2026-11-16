@@ -11,7 +11,15 @@ int main(void)
     while (scanf(" %c", &command) == 1)
     {
         if (command == 'f')
+        {
+            if (hash != NULL)
+            {
+                free(hash->lista1);
+                free(hash->lista2);
+                free(hash);
+            }
             break;
+        }
 
         switch (command)
         {

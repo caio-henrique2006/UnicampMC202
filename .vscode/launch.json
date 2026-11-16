@@ -8,7 +8,7 @@
       "name": "Debug",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${fileDirname}/darray",     // Executavel gerado
+      "program": "${fileDirname}/hash",     // Executavel gerado
       "args": [],
       "stopAtEntry": false,
       "cwd": "${fileDirname}",
