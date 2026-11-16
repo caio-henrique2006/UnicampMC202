@@ -14,8 +14,11 @@ typedef struct
 {
     slot *lista1;
     slot *lista2;
+    int qt_lista1;
+    int qt_lista2;
     int tam;
     int max;
+    int seed; // Muda a cada redimensionamento para variar as funcoes hash
 } Hash;
 
 Hash criar(Hash *hash, int tam);

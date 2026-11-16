@@ -5,6 +5,7 @@
 int main(void)
 {
     Hash *hash = malloc(sizeof(*hash));
+    hash->lista1 = hash->lista2 = NULL;
     char command;
 
     while (scanf(" %c", &command) == 1)
